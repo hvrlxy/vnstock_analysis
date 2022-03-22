@@ -18,8 +18,17 @@ class ReformatFinanceReport:
                             'Các khoản phải thu dài hạn', 'Tài sản cố định', 'Tài sản dở dang dài hạn',
                             'TỔNG CỘNG NGUỒN VỐN', 'Nợ phải trả', ' Vay tài sản tài chính ngắn hạn ',
                             'Nợ dài hạn', 'Vốn chủ sở hữu', 'Nguồn kinh phí và quỹ khác']
+        self.col_names = ['Current_Assets','Short_term_financial_investments',
+                          'Cash_and_cash_equivalents', 'Short_term_receivables',
+                          'Inventories', 'other_short_term_assets',
+                          'Non_current_assets', 'long_term_receivable', 'Fixed_assets',
+                          'Long_term_assets_in_progress', 'Liabilities', 'Current_liabilities',
+                          'Short_term_borrowing', 'Long_term_liabilities',
+                          'Owners_equity', 'Other_fund']
+        self.map = {self.picked_cols[i]:self.col_names[i] for i in range(len(self.picked_cols))}
 
         self.finance_df = self.finance_df[self.picked_cols]
+        self.finance_df = self.finance_df.rename(columns=self.map)
 
 
     def load_data(self):
@@ -33,7 +42,7 @@ class ReformatFinanceReport:
         return data_finance.T
 
     def export_to_excel(self):
-        file_path = '../results/excels/'
+        file_path = '../../results/excels/'
         self.finance_df.to_excel(self.stock_code + ".xlsx")
 
 #unit testing

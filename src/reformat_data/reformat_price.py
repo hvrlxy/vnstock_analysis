@@ -115,6 +115,10 @@ class ReformatPrice:
         '''
         print(self.load_data().columns)
 
+    def export_to_excel(self):
+        file_path = '../../results/excels/'
+        self.finance_df.to_excel(self.stock_code + ".xlsx")
+
 #unit testing
 # test_class = ReformatPrice('VND', '2018-02-02', '2018-04-02')
 # print(test_class.price_df.head(5))

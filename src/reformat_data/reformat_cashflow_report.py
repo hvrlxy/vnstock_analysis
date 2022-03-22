@@ -1,10 +1,6 @@
 import vnquant.DataLoader as dl
-import pandas as pd
-import numpy as np
-from datetime import timedelta
-from datetime import datetime as dt
 
-class ReformatBusinessReport:
+class ReformatCashflowReport:
     def __init__(self, symbol: str, start: str, end: str, data_source = 'cafe', minimal = True):
         self.stock_code = symbol
         self.start = start
@@ -12,7 +8,7 @@ class ReformatBusinessReport:
         self.data_source = data_source
         self.minimal = minimal
 
-        self.business_df = self.load_data()
+        self.cash_df = self.load_data()
 
     def load_data(self):
         loader = dl.FinanceLoader(symbol = self.stock_code,
@@ -20,16 +16,17 @@ class ReformatBusinessReport:
                                   end = self.end,
                                   data_source = self.data_source,
                                   minimal = self.minimal)
-        data_bus = loader.get_business_report()
-        return data_bus.T
+        data_cash = loader.get_cashflow_report()
+        return data_cash.T
 
     def export_to_excel(self):
-        file_path = '/results/excels/'
-        self.business_df.to_excel(self.stock_code + ".xlsx")
+        file_path = '../../results/excels/'
+        self.cash_df.to_excel(self.stock_code + ".xlsx")
 
 #unit testing
-business_test = ReformatBusinessReport('VND', '2019-06-02','2021-12-31')
-df = business_test.business_df
-business_test.export_to_excel()
-print(df.head(5))
-print(list(df.columns))
+# cash_test = ReformatYearlyIndex('VND', '2019-06-02','2021-12-31')
+# df = cash_test.cash_df
+# cash_test.export_to_excel()
+# print(df.head(5))
+# cols = list(df.columns)
+# print(cols)
