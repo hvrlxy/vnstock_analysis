@@ -22,8 +22,13 @@ class ReformatFinanceReport:
         data_finance = loader.get_finan_report()
         return data_finance.T
 
+    def export_to_excel(self):
+        file_path = '../results/excels/'
+        self.finance_df.to_excel(self.stock_code + ".xlsx")
+
 #unit testing
 finance_test = ReformatFinanceReport('VND', '2019-06-02','2021-12-31')
 df = finance_test.finance_df
-print(list(df.columns))
+finance_test.export_to_excel()
+# print(list(df.columns))
 
