@@ -12,6 +12,15 @@ def median(data, l=0):
             med.append(tmp[int(round((len(tmp)) / 2))]);
             pl = pl[1:];
     return med;
+def mad(data, l=0):
+    l = l if l > 0 else len(data); med = [];
+    for i in range(l, len(data)+1):
+        tmp = data[i-l:i];
+        m = median(data[i-l:i]); adev = [];
+        for q in range(len(tmp)): adev.append(abs(float(tmp[q]) - float(m[len(m)-1])));
+        ad = median(adev);
+        med.append(ad[len(ad)-1]);
+    return med;
 def rsi(data, l=14): #14 is typical period of data, changed by users
     pl = []; rs = [];
     for i in range(1, len(data)):
