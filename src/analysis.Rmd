@@ -1,0 +1,23 @@
+---
+title: "stock_visualization"
+author: "Ha Le"
+date: "3/22/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE, echo=TRUE}
+Sys.setenv(RETICULATE_PYTHON = "/Users/hale/opt/anaconda3/bin/python3")
+library(reticulate)
+py_install("pandas")
+```
+
+```{python}
+#from merge_data import MergeData
+pd <- import("pandas",as = "pd",convert = FALSE)
+md <- import("merge_data.py",as = "md",convert = FALSE)
+
+merge_class = md.MergeData('VND', '2019-07-02', '2020-12-31')
+#price_df = merge_class.price_df
+#df <-  reticulate::py_to_r(price_df)
+#print(class(price_df))
+```

@@ -5,7 +5,7 @@ from datetime import timedelta
 from datetime import datetime as dt
 
 class ReformatBusinessReport:
-    def __init__(self, symbol: str, start: str, end: str, data_source = 'cafe', minimal = True):
+    def __init__(self, symbol, start, end, data_source = 'cafe', minimal = True):
         self.stock_code = symbol
         self.start = start
         self.end = end

@@ -5,7 +5,7 @@ from datetime import timedelta
 from datetime import datetime as dt
 
 class ReformatPrice:
-    def __init__(self, stock_code: str, start: str, end: str, minimal = True, data_source = 'cafe'):
+    def __init__(self, stock_code, start, end, minimal = True, data_source = 'cafe'):
         # read in the input variables
         self.stock_code = stock_code
         self.start = start

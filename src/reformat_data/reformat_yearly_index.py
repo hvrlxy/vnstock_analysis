@@ -1,7 +1,11 @@
 import vnquant.DataLoader as dl
 
 class ReformatYearlyIndex:
-    def __init__(self, symbol: str, start: str, end: str, data_source = 'cafe', minimal = True):
+    def __init__(self, symbol, start, end, data_source = 'cafe', minimal = True):
+        """
+
+        @rtype: object
+        """
         self.stock_code = symbol
         self.start = start
         self.end = end

@@ -1,7 +1,7 @@
 import vnquant.DataLoader as dl
 
 class ReformatCashflowReport:
-    def __init__(self, symbol: str, start: str, end: str, data_source = 'cafe', minimal = True):
+    def __init__(self, symbol, start, end, data_source = 'cafe', minimal = True):
         self.stock_code = symbol
         self.start = start
         self.end = end
@@ -11,6 +11,10 @@ class ReformatCashflowReport:
         self.cash_df = self.load_data()
 
     def load_data(self):
+        '''
+        load the data from vnquant dataset
+        @return:
+        '''
         loader = dl.FinanceLoader(symbol = self.stock_code,
                                   start = self.start,
                                   end = self.end,
@@ -20,6 +24,10 @@ class ReformatCashflowReport:
         return data_cash.T
 
     def export_to_excel(self):
+        '''
+        export dataset to excel
+        @return:
+        '''
         file_path = '../../results/excels/'
         self.cash_df.to_excel(self.stock_code + ".xlsx")
 

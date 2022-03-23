@@ -5,7 +5,7 @@ from datetime import timedelta
 from datetime import datetime as dt
 
 class ReformatFinanceReport:
-    def __init__(self, symbol: str, start: str, end: str):
+    def __init__(self, symbol, start, end):
         self.stock_code = symbol
         self.start = start
         self.end = end
@@ -42,6 +42,10 @@ class ReformatFinanceReport:
         return data_finance.T
 
     def export_to_excel(self):
+        '''
+        Export the file to excel format
+        @return:
+        '''
         file_path = '../../results/excels/'
         self.finance_df.to_excel(self.stock_code + ".xlsx")
 
