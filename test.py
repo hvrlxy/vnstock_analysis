@@ -1,6 +1,5 @@
 import vnquant.DataLoader as web
 import datetime as dt
-import pandas_datareader as pdr
 loader = web.DataLoader('VND', '2018-01-01', '2019-01-01')
 data = loader.download()
 def median(data, l=0):
@@ -76,4 +75,18 @@ def ema(data, l=12):
             f = sum(pl) / l if len(em) <= 0 else (data[i] - em[len(em) - 1]) * weight + em[len(em) - 1]
             em.append(f);
             pl = pl[1:];
-    return em
+    return em;
+def tsi(data, long=25, short=13, sig=13):
+    mo = []; ab = []; ts = []; tsi = [];
+    for i in range(1, len(data)):
+        mo.append(data[i] - data[i - 1]);
+        ab.append(abs(data[i] - data[i - 1]));
+    sma1 = ema(mo, long); sma2 = ema(ab, long);
+    ema1 = ema(sma1, short); ema2 = ema(sma2, short);
+    for i in range(len(ema1)):
+        ts.append(ema1[i] / ema2[i]);
+    tma = ema(ts, sig);
+    ts = ts[(len(ts)-len(tma)):];
+    for i in range(len(tma)):
+        tsi.append([tma[i], ts[i]]);
+    return tsi;
