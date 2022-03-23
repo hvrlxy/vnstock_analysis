@@ -30,6 +30,10 @@ class MergeData:
 
 
     def add_quarter(self):
+        '''
+        retrieve the quarter of datetime object
+        @return: list of string
+        '''
         date_list = list(self.price_df['date'].dt.quarter)
         year_list = list(self.price_df['date'].dt.year)
         quarter_list = []
@@ -46,10 +50,18 @@ class MergeData:
         return quarter_list
 
     def export_to_excel(self):
+        '''
+        Export the file to excel
+        @return:
+        '''
         file_path = "../../results/excels/"
         self.price_df.to_excel(self.stock_code + ".xlsx")
 
     def export_to_csv(self):
+        '''
+        Export the file to csv
+        @return:
+        '''
         file_path = "../../results/excels/"
         self.price_df.to_csv(self.stock_code + ".csv")
 
