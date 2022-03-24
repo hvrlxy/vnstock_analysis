@@ -8,6 +8,15 @@
 #
 
 library(shiny)
+library(tidyr)
+library(tidyverse)
+library(dygraphs)
+library(ggplot2)
+library(xts)
+library(forecast)
+library(Metrics)
+library(xgboost)
+library(keras)
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(

@@ -14,6 +14,7 @@ library(xts)
 library(forecast)
 library(Metrics)
 library(xgboost)
+library(keras)
 ```
 
 ```{r}
@@ -120,3 +121,6 @@ ggplot(test1_df, aes(x = date)) +
 
 rmse(backward, train1_df)
 ```
+# Predicting Using LSTM Vanilla model
+## Building the structure of the LSTM
+
