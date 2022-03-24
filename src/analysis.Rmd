@@ -1,23 +1,57 @@
 ---
-title: "stock_visualization"
-author: "Ha Le"
+title: "Predicting Stock Price Using Technical Indicators"
+author: "Ha Le and Duong Pham"
 date: "3/22/2022"
 output: html_document
 ---
 
 ```{r setup, include=FALSE, echo=TRUE}
-Sys.setenv(RETICULATE_PYTHON = "/Users/hale/opt/anaconda3/bin/python3")
-library(reticulate)
-py_install("pandas")
+library(tidyr)
+library(tidyverse)
+library(dygraphs)
+library(ggplot2)
+library(xts)
+library(forecast)
+library(Metrics)
 ```
 
-```{python}
-#from merge_data import MergeData
-pd <- import("pandas",as = "pd",convert = FALSE)
-md <- import("merge_data.py",as = "md",convert = FALSE)
+```{r}
+#read in the dataset
+price_df <- read_csv('../results/csvs/simplifies_df.csv') %>% as_tibble()
+input_stock <- 'MBB'
+stock_df <- price_df %>% filter(stock_code == input_stock)
+stock_df
+```
+# Visualizing Stock Price Using  Dygraphs (Panel 1)
 
-merge_class = md.MergeData('VND', '2019-07-02', '2020-12-31')
-#price_df = merge_class.price_df
-#df <-  reticulate::py_to_r(price_df)
-#print(class(price_df))
+```{r}
+data <- data.frame(
+  time= stock_df$date, 
+  value1=stock_df$open, 
+  value2=stock_df$high, 
+  value3=stock_df$low, 
+  value4=stock_df$close 
+)
+
+# switch to xts format
+data <- xts(x = data[,-1], order.by = data$time)
+
+# Plot it
+p <- dygraph(data) %>%
+  dyCandlestick()
+p
+```
+# Training and Fitting ARIMA model
+
+```{r}
+#create training and testing period
+train1_df <- stock_df %>% 
+  filter(stock_df$date >= as.Date('2021-06-01') & 
+           stock_df$date <= as.Date('2021-12-31')) %>%
+  select(c(date, close))
+  
+test1_df <- stock_df %>%
+  filter(stock_df$date >= as.Date('2022-01-01')) %>%
+  select(c(date, close))
+test1_df
 ```
