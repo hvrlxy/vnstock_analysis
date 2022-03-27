@@ -3,7 +3,7 @@ import pandas as pd
 from indicators import *
 
 
-stock_list = ['DIG', 'ORS', 'PVS', 'GAS', 'GEX', 'MBB', 'HPG', 'FPT'] #, 'SSA', 'MWG' 'ACV', 'MSR'
+stock_list = ['VND', 'VNM', 'DIG', 'ORS', 'PVS', 'GAS', 'GEX', 'MBB', 'HPG', 'FPT'] #, 'SSA', 'MWG' 'ACV', 'MSR'
 start_date = '2016-10-01'
 end_date = '2022-02-01'
 

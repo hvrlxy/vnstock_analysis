@@ -15,12 +15,15 @@ library(forecast)
 library(Metrics)
 library(xgboost)
 library(keras)
+library(randomForest)
+library(devtools)
+library(modelr)
 ```
 
 ```{r}
 #read in the dataset
 price_df <- read_csv('../results/csvs/simplified_df.csv') %>% as_tibble()
-input_stock <- 'ORS'
+input_stock <- 'FPT'
 stock_df <- price_df %>% filter(stock_code == input_stock)
 stock_df <- stock_df %>% filter(date >= as.Date('2017-01-01'))
 stock_df
@@ -44,7 +47,8 @@ p <- dygraph(data) %>%
   dyCandlestick()
 p
 ```
-# Training and Fitting ARIMA model
+# Univariate Time Series Forecast 
+# Training and Fitting ARIMA model (Baseline Model)
 
 ```{r}
 #create training and testing period
@@ -57,9 +61,6 @@ test1_df <- stock_df %>%
   filter(stock_df$date >= as.Date('2022-01-01')) %>%
   select(c(date, close))
 
-```
-
-```{r}
 #train the model on the training set
 arima <- auto.arima(train1_df$close)
 
@@ -69,7 +70,7 @@ summary(arima)
 # forecasting
 forecast = predict(arima,length(test1_df$close))
 # evaluation
-rmse(test1_df$close, forecast$pred)
+rmsle(test1_df$close, forecast$pred)
 ```
 
 ```{r}
@@ -79,7 +80,38 @@ dygraph(predict_price)
 ```
 
 # Predicting Stock Price Using multivariate algorithms
-## XGBoost
+## OLS Linear Regression
+```{r}
+#create training and testing period
+train1_df <- stock_df %>% 
+  filter(stock_df$date >= as.Date('2021-06-01') & 
+           stock_df$date <= as.Date('2021-12-31')) %>%
+  select(-open, -changes, -adjust, -...1, -date, -stock_code, -low, -high)
+
+test1_df <- stock_df %>% 
+  filter(stock_df$date >= as.Date('2022-01-01')) %>%
+  select(-open, -changes, -adjust, -...1, -date, -stock_code, -low, -high)
+
+date <- stock_df %>% filter(stock_df$date >= as.Date('2022-01-01'))
+date <- date$date
+all <- lm(close ~ ., data=train1_df)
+summary(all)
+
+colors <- c("Real Closing Price" = "blue", "Predicted Closing Price" = "red")
+
+# visualizing the result
+test1_df <- test1_df %>% add_predictions(all, var = "pred")
+ggplot(test1_df, aes(x = date)) + 
+  geom_line(aes(y = close, color = "Real Closing Price"), size = 0.5) +
+  geom_line(aes(y = pred, color = "Predicted Closing Price"), size = 0.5) +
+  labs(x = "Date",
+         y = "closing prices",
+         color = "Legend") +
+  scale_color_manual(values = colors)
+
+rmsle(test1_df$close, test1_df$pred)
+```
+## Backwards Stepwise Regression
 ```{r}
 #create training and testing period
 train1_df <- stock_df %>% 
@@ -98,9 +130,6 @@ intercept_only <- lm(close ~ 1, data=train1_df)
 all <- lm(close ~ ., data=train1_df)
 
 backward <- step(all, direction='backward', scope=formula(all), trace=0)
-
-backward$anova
-backward$coefficients
 summary(backward)
 ```
 
@@ -119,8 +148,56 @@ ggplot(test1_df, aes(x = date)) +
          color = "Legend") +
   scale_color_manual(values = colors)
 
-rmse(backward, train1_df)
+rmsle(test1_df$close, test1_df$pred)
 ```
+# Prediting Using Random Forest Regression
+```{r}
+#create training and testing period
+train1_df <- stock_df %>% 
+  filter(stock_df$date >= as.Date('2021-06-01') & 
+           stock_df$date <= as.Date('2021-12-31')) %>%
+  select(-open, -changes, -adjust, -...1, -date, -stock_code, -low, -high)
+
+test1_df <- stock_df %>% 
+  filter(stock_df$date >= as.Date('2022-01-01')) %>%
+  select(-open, -changes, -adjust, -...1, -date, -stock_code, -low, -high)
+
+#create the model
+rf = randomForest(close ~ ., data = train1_df)
+
+colors <- c("Real Closing Price" = "blue", "Predicted Closing Price" = "red")
+
+# visualizing the result
+test1_df <- test1_df %>% add_predictions(rf, var = "pred")
+ggplot(test1_df, aes(x = date)) + 
+  geom_line(aes(y = close, color = "Real Closing Price"), size = 0.5) +
+  geom_line(aes(y = pred, color = "Predicted Closing Price"), size = 0.5) +
+  labs(x = "Date",
+         y = "closing prices",
+         color = "Legend") +
+  scale_color_manual(values = colors)
+
+rmsle(test1_df$close, test1_df$pred)
+```
+
 # Predicting Using LSTM Vanilla model
 ## Building the structure of the LSTM
+```{r}
+model <- keras_model_sequential() %>% 
+  layer_flatten(input_shape = c(lookback / step, dim(data)[-1])) %>% 
+  layer_dense(units = 32, activation = "relu") %>% 
+  layer_dense(units = 1)
 
+model %>% compile(
+  optimizer = optimizer_rmsprop(),
+  loss = "mae"
+)
+
+history <- model %>% fit_generator(
+  train_gen,
+  steps_per_epoch = 500,
+  epochs = 20,
+  validation_data = val_gen,
+  validation_steps = val_steps
+)
+```
