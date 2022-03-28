@@ -21,6 +21,7 @@ library(randomForest)
 library(devtools)
 library(modelr)
 library(dplyr)
+library(broom)
 
 price_df <- read_csv('../../results/csvs/simplified_df.csv') %>% as_tibble()
 #input_stock <- 'FPT'
@@ -90,7 +91,8 @@ ui <- fluidPage(
                 tabPanel("Stock Price Overview", dygraphOutput("candlePlot")), 
                 tabPanel("Model Predictions", plotOutput("predPlot")), 
                 tabPanel("Model Performance", dygraphOutput("rmsePlot"), tableOutput("rmseTable")), 
-                tabPanel("Debugging", textOutput("debug"))
+                tabPanel("Indicators Comparison", tableOutput('indicatorTable')) #,
+                #tabPanel("Debugging", textOutput("debug"))
             )
         )
     )
@@ -512,14 +514,18 @@ server <- function(input, output) {
     })
     
     output$predPlot <- renderPlot({
+        colors <- c("Real Closing Price" = "blue", "Predicted Closing Price" = 'red')
         if (input$algorithms == 'ARIMA'){
-            ggplot(test1_df(), aes(x = date())) + 
+            p <- ggplot(test1_df(), aes(x = date())) + 
                 geom_line(aes(y = close, color = "Real Closing Price"), size = 0.5) +
                 geom_line(aes(y = arima.pred()$pred, color = "Predicted Closing Price"), size = 0.5) +
                 labs(x = "Date",
                      y = "closing prices",
                      color = "Legend") +
-                scale_color_manual(values = colors)
+                scale_color_manual(values = colors) +
+                title("Comparison Between Predicted and Real Closing Price")
+            
+            p
         }
         else if (input$algorithms == 'Linear Regression'){
             ggplot(test1_df(), aes(x = date())) + 
@@ -583,6 +589,13 @@ server <- function(input, output) {
         rmse.df <- data.frame(as.character(rmse.date), arima.rmse.lst(), lm.rmse.lst(), bm.rmse.lst(), rf.rmse.lst())
         colnames(rmse.df) <- c('Date', 'ARIMA (baseline)', 'Linear Regression', 'Stepwise Regression', 'Random Forest')
         rmse.df
+    })
+    
+    output$indicatorTable <- renderTable({
+        all.lm <- lm(close ~ ., data = train1_df())
+        train1_df() %>% 
+            do(tidy(all.lm <- lm(close ~ ., data = train1_df()))) %>% 
+            select(term, estimate, std.error, t_stat = statistic, p_value = p.value)
     })
     
 
