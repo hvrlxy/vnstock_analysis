@@ -5,7 +5,7 @@ from reformat_data.reformat_finance_report import *
 from reformat_data.reformat_business_report import *
 
 class MergeData:
-    def __init__(self, symbol, start, end, data_source = 'cafe', minimal = True, simplified = True):
+    def __init__(self, symbol: str, start, end, data_source = 'cafe', minimal = True, simplified = True):
         self.stock_code = symbol
         self.start = start
         self.end = end

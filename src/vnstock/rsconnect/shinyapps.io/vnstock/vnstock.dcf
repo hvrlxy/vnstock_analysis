@@ -1,0 +1,13 @@
+name: vnstock
+title: vnstock
+username:
+account: vnstock
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 5953101
+bundleId: 5749993
+url: https://vnstock.shinyapps.io/vnstock/
+when: 1648737969.44971
+lastSyncTime: 1648737969.44973
+asMultiple: FALSE
+asStatic: FALSE

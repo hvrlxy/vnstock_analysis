@@ -7,6 +7,7 @@
 #    http://shiny.rstudio.com/
 #
 
+library(shiny)
 library(lubridate)
 library(tidyr)
 library(tidyverse)
@@ -23,7 +24,7 @@ library(modelr)
 library(dplyr)
 library(broom)
 
-price_df <- read_csv('../../results/csvs/simplified_df.csv') %>% as_tibble()
+price_df <- read_csv('https://raw.githubusercontent.com/hvrlxy/hvrlxy.github.io/main/assets/datasets/vnstock/simplified_df.csv') %>% as_tibble()
 #input_stock <- 'FPT'
 #stock_df <- price_df %>% filter(stock_code == input_stock)
 stock_df <- stock_df %>% filter(date >= as.Date('2017-01-01'))
@@ -511,12 +512,17 @@ server <- function(input, output) {
         
         # Plot it
         dygraph(data) %>% dyCandlestick()
+            
     })
     
     output$predPlot <- renderPlot({
         colors <- c("Real Closing Price" = "blue", "Predicted Closing Price" = 'red')
+        result_df <- test1_df() %>% 
+            mutate(
+                date = date()
+                )
         if (input$algorithms == 'ARIMA'){
-            p <- ggplot(test1_df(), aes(x = date())) + 
+            p <- ggplot(result_df, aes(x = date)) + 
                 geom_line(aes(y = close, color = "Real Closing Price"), size = 0.5) +
                 geom_line(aes(y = arima.pred()$pred, color = "Predicted Closing Price"), size = 0.5) +
                 labs(x = "Date",
@@ -526,9 +532,15 @@ server <- function(input, output) {
                 title("Comparison Between Predicted and Real Closing Price")
             
             p
+            
+            # data <- xts(x = c(result_df$close, arima.pred()$pred), order.by = result_df$date)
+            # dygraph(data, main = "Model Comparison By RMSLE")%>%
+            #     dyHighlight(highlightCircleSize = 5, 
+            #                 highlightSeriesBackgroundAlpha = 0.2,
+            #                 hideOnMouseOut = FALSE)
         }
         else if (input$algorithms == 'Linear Regression'){
-            ggplot(test1_df(), aes(x = date())) + 
+            ggplot(result_df, aes(x = date)) + 
                 geom_line(aes(y = close, color = "Real Closing Price"), size = 0.5) +
                 geom_line(aes(y = lm.pred(), color = "Predicted Closing Price"), size = 0.5) +
                 labs(x = "Date",
@@ -537,7 +549,7 @@ server <- function(input, output) {
                 scale_color_manual(values = colors)
         }
         else if (input$algorithms == 'Stepwise Regression'){
-            ggplot(test1_df(), aes(x = date())) + 
+            ggplot(result_df, aes(x = date)) + 
                 geom_line(aes(y = close, color = "Real Closing Price"), size = 0.5) +
                 geom_line(aes(y = backward.pred(), color = "Predicted Closing Price"), size = 0.5) +
                 labs(x = "Date",
@@ -546,7 +558,7 @@ server <- function(input, output) {
                 scale_color_manual(values = colors)
         }
         else{
-            ggplot(test1_df(), aes(x = date())) + 
+            ggplot(result_df, aes(x = date)) + 
                 geom_line(aes(y = close, color = "Real Closing Price"), size = 0.5) +
                 geom_line(aes(y = rf.pred(), color = "Predicted Closing Price"), size = 0.5) +
                 labs(x = "Date",
@@ -572,7 +584,10 @@ server <- function(input, output) {
         rmse.df <- data.frame(rmse.date, arima.rmse.lst(), lm.rmse.lst(), bm.rmse.lst(), rf.rmse.lst())
         colnames(rmse.df) <- c('date', 'ARIMA (baseline)', 'LR', 'BR', 'RF')
         data <- xts(x = rmse.df[,-1], order.by = rmse.df$date)
-        dygraph(data, main = "Model Comparison By RMSLE")
+        dygraph(data, main = "Model Comparison By RMSLE")%>%
+            dyHighlight(highlightCircleSize = 5, 
+                        highlightSeriesBackgroundAlpha = 0.2,
+                        hideOnMouseOut = FALSE)
     })
     
     output$rmseTable <- renderTable({
