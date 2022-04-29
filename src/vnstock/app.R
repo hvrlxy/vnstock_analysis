@@ -88,6 +88,8 @@ ui <- fluidPage(
 
         # Show a plot of the generated distribution
         mainPanel(
+            textOutput("info1"),
+            textOutput("info2"),
             tabsetPanel(
                 tabPanel("Stock Price Overview", dygraphOutput("candlePlot")), 
                 tabPanel("Model Predictions", plotOutput("predPlot")), 
@@ -589,7 +591,13 @@ server <- function(input, output) {
                         highlightSeriesBackgroundAlpha = 0.2,
                         hideOnMouseOut = FALSE)
     })
-    
+    output$info1 <- renderText ({'This is a web application that is designed to let the user explore the relationship
+    between actual stock price and its predicted price using indicators
+    for 10 stocks in the sample from CafeF - a Vietnamese economics channels.'})
+    output$info2 <- renderText({' Use the drop down menu to choose the name of stock to 
+    investigate.Use the select option to choose date frame on which period to investigate on 
+    Model Predictions. Use the drop down menu choose the statistical analysis model on Model 
+    Predictions. Use the check box to decide which indicators to use for price prediction'})
     output$rmseTable <- renderTable({
         rmse.date <- c(as.Date('2017-06-01'),
                        as.Date('2018-01-01'),
