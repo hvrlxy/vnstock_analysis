@@ -2,6 +2,11 @@
 
 This repository contains the code for crawling stock pricing and volume data from the Vietnamese stock market, and a website to visualize the price overtime and different statistics models to predict the price movement. The crawling and cleaning data process is done in Python, and we use R to train the models and design the layout of the webpage. We use 10 different stock code that have been around for at least 5 years, and calculate up to 20 different basic technical indicators in order to predict price movement. Users can use the website to test the efficiency of different models and technical indicators, and economists can look at the charts andp-value to determine which model works best for which stock code.
 
+Link to the website:
+```
+https://vnstock.shinyapps.io/vnstock/
+```
+
 ## Stock Code
 We use 10 different stock code from different industries: energy industry (GAS, PVS), tech industry (FPT), banking industry (MBB), and real estate industry (HPG). Except for the energy, none of the other stock code data display a pattern for seasonality.
 
